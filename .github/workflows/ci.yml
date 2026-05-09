@@ -30,7 +30,7 @@ jobs:
       - name: Instalar dependências
         run: npm install || true
 
-      - name: Validar arquivos HTML
+      - name: Validar arquivos HTML 
         run: echo "Frontend estático validado"
 
       - name: Build informativo
