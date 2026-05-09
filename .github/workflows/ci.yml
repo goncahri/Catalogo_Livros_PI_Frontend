@@ -64,6 +64,21 @@ jobs:
             echo "RENDER_HML_DEPLOY_HOOK ainda não configurado"
           fi
 
+      - name: Rodar semantic-release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx semantic-release
+
+      - name: Obter versão gerada
+        if: github.ref == 'refs/heads/main'
+        id: version
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Versão gerada: $VERSION"
+
       - name: Login no Docker Hub PROD
         if: github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
@@ -75,11 +90,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           docker build -t goncahri/catalogo-livros-frontend:latest .
+          docker tag goncahri/catalogo-livros-frontend:latest goncahri/catalogo-livros-frontend:${{ steps.version.outputs.version }}
 
       - name: Push da imagem Docker PROD
         if: github.ref == 'refs/heads/main'
         run: |
           docker push goncahri/catalogo-livros-frontend:latest
+          docker push goncahri/catalogo-livros-frontend:${{ steps.version.outputs.version }}
 
       - name: Trigger Deploy Render PROD
         if: github.ref == 'refs/heads/main'
@@ -90,9 +107,24 @@ jobs:
             echo "RENDER_PROD_DEPLOY_HOOK ainda não configurado"
           fi
 
-      - name: Rodar semantic-release
-        if: github.ref == 'refs/heads/main'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: npx semantic-release
+      - name: Enviar e-mail em caso de falha
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: Falha no pipeline frontend - Catalogo Livros
+          to: ${{ secrets.EMAIL_TO }}
+          from: GitHub Actions Frontend
+          body: |
+            O pipeline do frontend falhou.
+
+            Repositório: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Autor: ${{ github.actor }}
+
+            Verifique os logs no GitHub Actions.
