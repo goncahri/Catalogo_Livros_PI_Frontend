@@ -33,8 +33,53 @@ jobs:
       - name: Validar arquivos HTML
         run: echo "Frontend estático validado"
 
-      - name: Build (informativo)
+      - name: Build informativo
         run: echo "Projeto HTML/CSS/JS sem etapa de build"
+
+      - name: Login no Docker Hub HML
+        if: github.ref == 'refs/heads/develop'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build da imagem Docker HML
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          docker build -t goncahri/catalogo-livros-frontend:hml .
+          docker tag goncahri/catalogo-livros-frontend:hml goncahri/catalogo-livros-frontend:develop
+
+      - name: Push da imagem Docker HML
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          docker push goncahri/catalogo-livros-frontend:hml
+          docker push goncahri/catalogo-livros-frontend:develop
+
+      - name: Trigger Deploy Render HML
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          if [ -n "${{ secrets.RENDER_HML_DEPLOY_HOOK }}" ]; then
+            curl -X POST "${{ secrets.RENDER_HML_DEPLOY_HOOK }}"
+          else
+            echo "RENDER_HML_DEPLOY_HOOK ainda não configurado"
+          fi
+
+      - name: Login no Docker Hub PROD
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build da imagem Docker PROD
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build -t goncahri/catalogo-livros-frontend:latest .
+
+      - name: Push da imagem Docker PROD
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker push goncahri/catalogo-livros-frontend:latest
 
       - name: Rodar semantic-release
         if: github.ref == 'refs/heads/main'

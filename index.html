@@ -332,13 +332,21 @@
     });
   }
 
+  const currentHost = window.location.hostname;
+
   const isLocal =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
+    currentHost === "localhost" ||
+    currentHost === "127.0.0.1";
+
+  const isHml =
+    currentHost.includes("hml") ||
+    currentHost.includes("develop");
 
   const baseURL = isLocal
     ? "http://localhost:3000/api"
-    : "https://catalogo-livros-pi-backend.onrender.com/api";
+    : isHml
+      ? "https://catalogo-livros-pi-backend-hml-docker.onrender.com/api"
+      : "https://catalogo-livros-pi-backend-prod-docker.onrender.com/api";
 
   const googleBooksURL = `${baseURL}/livros/busca/google`;
 
