@@ -81,6 +81,15 @@ jobs:
         run: |
           docker push goncahri/catalogo-livros-frontend:latest
 
+      - name: Trigger Deploy Render PROD
+        if: github.ref == 'refs/heads/main'
+        run: |
+          if [ -n "${{ secrets.RENDER_PROD_DEPLOY_HOOK }}" ]; then
+            curl -X POST "${{ secrets.RENDER_PROD_DEPLOY_HOOK }}"
+          else
+            echo "RENDER_PROD_DEPLOY_HOOK ainda não configurado"
+          fi
+
       - name: Rodar semantic-release
         if: github.ref == 'refs/heads/main'
         env:
