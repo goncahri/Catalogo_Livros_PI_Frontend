@@ -1,0 +1,25 @@
+# Build local
+docker build -t catalogo-livros-frontend .
+
+# Rodar local
+docker run -d -p 8080:80 --name catalogo-livros-front catalogo-livros-frontend
+
+# Logs
+docker logs catalogo-livros-front
+
+# Parar container
+docker stop catalogo-livros-front
+
+# Remover container
+docker rm catalogo-livros-front
+
+# Remover imagem
+docker rmi catalogo-livros-frontend
+
+# Docker Hub HML
+docker tag catalogo-livros-frontend goncahri/catalogo-livros-frontend:hml
+docker push goncahri/catalogo-livros-frontend:hml
+
+# Docker Hub PROD
+docker tag catalogo-livros-frontend goncahri/catalogo-livros-frontend:latest
+docker push goncahri/catalogo-livros-frontend:latest
