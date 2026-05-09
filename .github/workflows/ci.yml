@@ -30,11 +30,16 @@ jobs:
       - name: Instalar dependências
         run: npm install || true
 
-      - name: Validar arquivos HTML
+      - name: Validar arquivos HTML 
         run: echo "Frontend estático validado"
 
       - name: Build informativo
         run: echo "Projeto HTML/CSS/JS sem etapa de build"
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Login no Docker Hub HML
         if: github.ref == 'refs/heads/develop'
