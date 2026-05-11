@@ -164,7 +164,20 @@
 
           <div class="d-flex flex-wrap gap-2 mt-4">
             <button type="submit" class="btn btn-green">Criptografar</button>
-            <button type="button" id="btnAbrirWhatsapp" class="btn btn-success d-none">Enviar via WhatsApp</button>
+
+            <button
+              type="button"
+              id="btnEnviarSistema"
+              class="btn btn-primary d-none">
+              Enviar via Site
+            </button>
+
+            <button
+              type="button"
+              id="btnAbrirWhatsapp"
+              class="btn btn-success d-none">
+              Enviar via WhatsApp
+            </button>
           </div>
         </form>
 
@@ -360,6 +373,21 @@
   const btnAbrirWhatsapp =
     document.getElementById(
       "btnAbrirWhatsapp"
+    );
+
+  const btnEnviarSistema =
+    document.getElementById(
+      "btnEnviarSistema"
+    );
+
+  btnEnviarSistema
+    .addEventListener(
+      "click",
+      () => {
+        alert(
+          "✅ Spoiler enviado pelo sistema! O destinatário já pode visualizá-lo em 'Spoilers recebidos'."
+        );
+      }
     );
 
   const btnAtualizarRecebidos =
@@ -565,9 +593,14 @@
         );
 
         opcoesEnvioSpoiler
-          .classList.remove(
-            "d-none"
-          );
+        .classList.remove(
+          "d-none"
+        );
+
+      btnEnviarSistema
+        .classList.remove(
+          "d-none"
+        );
 
         whatsappUrlAtual =
           resposta.whatsappUrl || "";
