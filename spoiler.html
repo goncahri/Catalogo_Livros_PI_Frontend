@@ -140,7 +140,9 @@
 
           <div class="mb-3">
             <label class="form-label">Livro</label>
-            <input type="text" id="livroSpoiler" class="form-control" placeholder="Ex: Harry Potter" required />
+            <select id="livroSpoiler" class="form-select" required>
+              <option value="">Carregando livros...</option>
+            </select>
           </div>
 
           <div class="mb-3">
@@ -296,6 +298,7 @@
   let whatsappUrlAtual = "";
   let emailUrlAtual = "";
 
+  const selectLivro = document.getElementById("livroSpoiler");
   const selectDestinatario = document.getElementById("destinatarioSpoiler");
   const formCriarSpoiler = document.getElementById("formCriarSpoiler");
   const formRevelarSpoiler = document.getElementById("formRevelarSpoiler");
@@ -304,6 +307,40 @@
   const btnAtualizarRecebidos = document.getElementById("btnAtualizarRecebidos");
   const tabelaSpoilersRecebidos = document.getElementById("tabelaSpoilersRecebidos");
   const opcoesEnvioSpoiler = document.getElementById("opcoesEnvioSpoiler");
+
+  async function carregarLivros() {
+    try {
+      const res = await fetch(`${baseURL}/livros?limit=10000`, {
+        headers: authHeaders
+      });
+
+      const json = await res.json();
+      const livros = json.data || json;
+
+      if (!res.ok) {
+        selectLivro.innerHTML = `<option value="">Erro ao carregar livros</option>`;
+        return;
+      }
+
+      if (!Array.isArray(livros) || livros.length === 0) {
+        selectLivro.innerHTML = `<option value="">Nenhum livro cadastrado</option>`;
+        return;
+      }
+
+      selectLivro.innerHTML = `<option value="">Selecione um livro</option>`;
+
+      livros.forEach(livro => {
+        const option = document.createElement("option");
+        option.value = livro.titulo || "";
+        option.textContent = `${livro.titulo || "Sem título"} - ${livro.autor || "Autor não informado"}`;
+        selectLivro.appendChild(option);
+      });
+
+    } catch (error) {
+      console.error("Erro ao carregar livros:", error);
+      selectLivro.innerHTML = `<option value="">Erro ao carregar livros</option>`;
+    }
+  }
 
   async function carregarUsuarios() {
     try {
@@ -384,8 +421,7 @@
         resposta.mensagem ||
         "";
 
-      const hash =
-        resposta.hash || "";
+      const hash = resposta.hash || "";
 
       document.getElementById("resultadoLivro").textContent =
         resposta.livro || livro;
@@ -560,6 +596,7 @@
 
   btnAtualizarRecebidos.addEventListener("click", carregarSpoilersRecebidos);
 
+  carregarLivros();
   carregarUsuarios();
   carregarSpoilersRecebidos();
 </script>
