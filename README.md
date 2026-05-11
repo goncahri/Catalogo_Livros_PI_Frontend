@@ -16,10 +16,10 @@ Aplicando conceitos modernos de:
 # 🌐 Aplicação online
 
 ## Produção (PROD)
-https://catalogo-livros-pi-frontend-prod-docker.onrender.com/index.html
+https://catalogo-livros-pi-frontend-prod-docker.onrender.com/usuario.html
 
 ## Homologação (HML)
-https://catalogo-livros-pi-frontend-hml-docker.onrender.com/index.html
+https://catalogo-livros-pi-frontend-hml.onrender.com/usuario.html
 
 ---
 
@@ -116,7 +116,7 @@ Authorization: Bearer TOKEN
 URL:
 
 ```bash
-https://catalogo-livros-pi-frontend-hml-docker.onrender.com/index.html
+https://catalogo-livros-pi-frontend-hml.onrender.com/usuario.html
 ```
 
 Origem:
@@ -139,7 +139,7 @@ develop
 URL:
 
 ```bash
-https://catalogo-livros-pi-frontend-prod-docker.onrender.com/index.html
+https://catalogo-livros-pi-frontend-prod-docker.onrender.com/usuario.html
 ```
 
 Origem:
