@@ -382,21 +382,21 @@
     const livro = document.getElementById("livroSpoiler").value.trim();
     const mensagem = document.getElementById("mensagemSpoiler").value.trim();
     const passo = Number(document.getElementById("passoSpoiler").value);
-    const destinatario = document.getElementById("destinatarioSpoiler").value;
+    const destinatarioId = document.getElementById("destinatarioSpoiler").value;
     const destinatarioSelecionado = selectDestinatario.options[selectDestinatario.selectedIndex];
     const emailDestinatario = destinatarioSelecionado?.dataset?.email || "";
 
-    if (!livro || !mensagem || !passo || !destinatario) {
-      alert("Preencha todos os campos para criar o spoiler.");
-      return;
-    }
+    if (!livro || !mensagem || !passo || !destinatarioId) {
+    alert("Preencha todos os campos para criar o spoiler.");
+    return;
+  }
 
-    const dados = {
-      livro,
-      mensagem,
-      passo,
-      destinatario
-    };
+  const dados = {
+    livro,
+    mensagem,
+    passo,
+    destinatarioId
+  };
 
     try {
       const res = await fetch(`${baseURL}/spoilers/criptografar`, {
