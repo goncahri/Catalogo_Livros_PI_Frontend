@@ -596,7 +596,7 @@ const fetchLivros = async (filtros = {}) => {
 
       const gData = await gRes.json();
 
-      document.getElementById("detalheImagem").src = gData.thumbnail || "images/default-cover.png";
+      document.getElementById("detalheImagem").src = (gData.thumbnail || "").replace("http://", "https://") || "images/default-cover.png";
       document.getElementById("detalheSinopse").innerText = gData.sinopse || "Sem sinopse disponível.";
 
       document.getElementById("detalhesLivro").classList.remove("d-none");
