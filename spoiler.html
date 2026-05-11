@@ -165,7 +165,6 @@
           <div class="d-flex flex-wrap gap-2 mt-4">
             <button type="submit" class="btn btn-green">Criptografar</button>
             <button type="button" id="btnAbrirWhatsapp" class="btn btn-success d-none">Enviar via WhatsApp</button>
-            <button type="button" id="btnEnviarEmail" class="btn btn-primary d-none">Enviar via E-mail</button>
           </div>
         </form>
 
@@ -177,8 +176,9 @@
 
           <div id="opcoesEnvioSpoiler" class="alert alert-secondary mt-3 mb-0 d-none">
             <strong>Deseja enviar seu spoiler?</strong><br>
-            Clique em <strong>Enviar via WhatsApp</strong> para abrir uma conversa com a mensagem pronta
-            ou em <strong>Enviar via E-mail</strong> para abrir seu aplicativo de e-mail com os dados do spoiler.
+            O spoiler já ficará disponível na área <strong>Spoilers recebidos</strong> do destinatário.
+            Se o usuário possuir WhatsApp cadastrado, você também pode clicar em
+            <strong>Enviar via WhatsApp</strong> para abrir uma conversa com a mensagem pronta.
           </div>
         </div>
       </div>
@@ -253,33 +253,73 @@
   const authHeaders = { Authorization: `Bearer ${token}` };
 
   let usuario = null;
+
   try {
     const usuarioStr = localStorage.getItem("usuarioLogado");
-    if (usuarioStr && usuarioStr !== "undefined") usuario = JSON.parse(usuarioStr);
+
+    if (
+      usuarioStr &&
+      usuarioStr !== "undefined"
+    ) {
+      usuario = JSON.parse(usuarioStr);
+    }
+
   } catch (e) {
-    console.error("Erro ao ler dados do usuário:", e);
+    console.error(
+      "Erro ao ler dados do usuário:",
+      e
+    );
   }
 
-  if (usuario?.nome && document.getElementById("userName")) {
-    const primeiroNome = usuario.nome.split(" ")[0];
-    document.getElementById("userName").textContent = primeiroNome;
+  if (
+    usuario?.nome &&
+    document.getElementById("userName")
+  ) {
+    const primeiroNome =
+      usuario.nome.split(" ")[0];
+
+    document.getElementById(
+      "userName"
+    ).textContent = primeiroNome;
   }
 
-  if (usuario && document.getElementById("userAvatar")) {
-    const avatarURL = `https://ui-avatars.com/api/?name=${encodeURIComponent(usuario.nome)}&background=4CAF50&color=fff`;
-    document.getElementById("userAvatar").src = avatarURL;
+  if (
+    usuario &&
+    document.getElementById("userAvatar")
+  ) {
+    const avatarURL =
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(usuario.nome)}&background=4CAF50&color=fff`;
+
+    document.getElementById(
+      "userAvatar"
+    ).src = avatarURL;
   }
 
-  const btnSair = document.getElementById("btnSair");
+  const btnSair =
+    document.getElementById(
+      "btnSair"
+    );
+
   if (btnSair) {
-    btnSair.addEventListener("click", () => {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("usuarioLogado");
-      window.location.href = "usuario.html";
-    });
+    btnSair.addEventListener(
+      "click",
+      () => {
+        localStorage.removeItem(
+          "access_token"
+        );
+
+        localStorage.removeItem(
+          "usuarioLogado"
+        );
+
+        window.location.href =
+          "usuario.html";
+      }
+    );
   }
 
-  const currentHost = window.location.hostname;
+  const currentHost =
+    window.location.hostname;
 
   const isLocal =
     currentHost === "localhost" ||
@@ -296,305 +336,416 @@
       : "https://catalogo-livros-pi-backend-prod-docker.onrender.com/api";
 
   let whatsappUrlAtual = "";
-  let emailUrlAtual = "";
 
-  const selectLivro = document.getElementById("livroSpoiler");
-  const selectDestinatario = document.getElementById("destinatarioSpoiler");
-  const formCriarSpoiler = document.getElementById("formCriarSpoiler");
-  const formRevelarSpoiler = document.getElementById("formRevelarSpoiler");
-  const btnAbrirWhatsapp = document.getElementById("btnAbrirWhatsapp");
-  const btnEnviarEmail = document.getElementById("btnEnviarEmail");
-  const btnAtualizarRecebidos = document.getElementById("btnAtualizarRecebidos");
-  const tabelaSpoilersRecebidos = document.getElementById("tabelaSpoilersRecebidos");
-  const opcoesEnvioSpoiler = document.getElementById("opcoesEnvioSpoiler");
+  const selectLivro =
+    document.getElementById(
+      "livroSpoiler"
+    );
+
+  const selectDestinatario =
+    document.getElementById(
+      "destinatarioSpoiler"
+    );
+
+  const formCriarSpoiler =
+    document.getElementById(
+      "formCriarSpoiler"
+    );
+
+  const formRevelarSpoiler =
+    document.getElementById(
+      "formRevelarSpoiler"
+    );
+
+  const btnAbrirWhatsapp =
+    document.getElementById(
+      "btnAbrirWhatsapp"
+    );
+
+  const btnAtualizarRecebidos =
+    document.getElementById(
+      "btnAtualizarRecebidos"
+    );
+
+  const tabelaSpoilersRecebidos =
+    document.getElementById(
+      "tabelaSpoilersRecebidos"
+    );
+
+  const opcoesEnvioSpoiler =
+    document.getElementById(
+      "opcoesEnvioSpoiler"
+    );
 
   async function carregarLivros() {
     try {
-      const res = await fetch(`${baseURL}/livros?limit=10000`, {
-        headers: authHeaders
-      });
+      const res =
+        await fetch(
+          `${baseURL}/livros?limit=10000`,
+          {
+            headers:
+              authHeaders
+          }
+        );
 
-      const json = await res.json();
-      const livros = json.data || json;
+      const json =
+        await res.json();
 
-      if (!res.ok) {
-        selectLivro.innerHTML = `<option value="">Erro ao carregar livros</option>`;
+      const livros =
+        json.data || json;
+
+      if (
+        !Array.isArray(
+          livros
+        )
+      ) {
         return;
       }
 
-      if (!Array.isArray(livros) || livros.length === 0) {
-        selectLivro.innerHTML = `<option value="">Nenhum livro cadastrado</option>`;
-        return;
-      }
+      selectLivro.innerHTML =
+        `<option value="">Selecione um livro</option>`;
 
-      selectLivro.innerHTML = `<option value="">Selecione um livro</option>`;
+      livros.forEach(
+        (livro) => {
+          const option =
+            document.createElement(
+              "option"
+            );
 
-      livros.forEach(livro => {
-        const option = document.createElement("option");
-        option.value = livro.titulo || "";
-        option.textContent = `${livro.titulo || "Sem título"} - ${livro.autor || "Autor não informado"}`;
-        selectLivro.appendChild(option);
-      });
+          option.value =
+            livro.titulo;
+
+          option.textContent =
+            `${livro.titulo} - ${livro.autor}`;
+
+          selectLivro.appendChild(
+            option
+          );
+        }
+      );
 
     } catch (error) {
-      console.error("Erro ao carregar livros:", error);
-      selectLivro.innerHTML = `<option value="">Erro ao carregar livros</option>`;
+      console.error(
+        "Erro ao carregar livros:",
+        error
+      );
     }
   }
 
   async function carregarUsuarios() {
     try {
-      const res = await fetch(`${baseURL}/spoilers/usuarios`, {
-        headers: authHeaders
-      });
+      const res =
+        await fetch(
+          `${baseURL}/spoilers/usuarios`,
+          {
+            headers:
+              authHeaders
+          }
+        );
 
-      const usuarios = await res.json();
+      const usuarios =
+        await res.json();
 
-      if (!res.ok) {
-        selectDestinatario.innerHTML = `<option value="">Erro ao carregar usuários</option>`;
+      if (
+        !Array.isArray(
+          usuarios
+        )
+      ) {
         return;
       }
 
-      if (!Array.isArray(usuarios) || usuarios.length === 0) {
-        selectDestinatario.innerHTML = `<option value="">Nenhum usuário encontrado</option>`;
-        return;
-      }
+      selectDestinatario.innerHTML =
+        `<option value="">Selecione um usuário</option>`;
 
-      selectDestinatario.innerHTML = `<option value="">Selecione um usuário</option>`;
+      usuarios.forEach(
+        (user) => {
+          const option =
+            document.createElement(
+              "option"
+            );
 
-      usuarios.forEach(user => {
-        const option = document.createElement("option");
-        option.value = user._id || user.id || user.email;
-        option.textContent = `${user.nome || "Usuário"} - ${user.email || "sem e-mail"}`;
-        option.dataset.email = user.email || "";
-        selectDestinatario.appendChild(option);
-      });
+          option.value =
+            user._id;
 
-    } catch (error) {
-      console.error("Erro ao carregar usuários:", error);
-      selectDestinatario.innerHTML = `<option value="">Erro ao carregar usuários</option>`;
-    }
-  }
+          option.textContent =
+            `${user.nome} - ${user.email || "sem e-mail"}`;
 
-  formCriarSpoiler.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const livro = document.getElementById("livroSpoiler").value.trim();
-    const mensagem = document.getElementById("mensagemSpoiler").value.trim();
-    const passo = Number(document.getElementById("passoSpoiler").value);
-    const destinatarioId = document.getElementById("destinatarioSpoiler").value;
-    const destinatarioSelecionado = selectDestinatario.options[selectDestinatario.selectedIndex];
-    const emailDestinatario = destinatarioSelecionado?.dataset?.email || "";
-
-    if (!livro || !mensagem || !passo || !destinatarioId) {
-    alert("Preencha todos os campos para criar o spoiler.");
-    return;
-  }
-
-  const dados = {
-    livro,
-    mensagem,
-    passo,
-    destinatarioId
-  };
-
-    try {
-      const res = await fetch(`${baseURL}/spoilers/criptografar`, {
-        method: "POST",
-        headers: {
-          ...authHeaders,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados)
-      });
-
-      const resposta = await res.json();
-
-      if (!res.ok) {
-        alert(resposta.message || resposta.erro || "Erro ao criptografar spoiler.");
-        return;
-      }
-
-      const mensagemCriptografada =
-        resposta.mensagemCriptografada ||
-        resposta.mensagem_criptografada ||
-        resposta.mensagem ||
-        "";
-
-      const hash = resposta.hash || "";
-
-      document.getElementById("resultadoLivro").textContent =
-        resposta.livro || livro;
-
-      document.getElementById("resultadoMensagem").textContent =
-        mensagemCriptografada;
-
-      document.getElementById("resultadoHash").textContent =
-        hash;
-
-      document.getElementById("resultadoCriptografia").classList.remove("d-none");
-      opcoesEnvioSpoiler.classList.remove("d-none");
-
-      whatsappUrlAtual = resposta.whatsappUrl || "";
-
-      if (whatsappUrlAtual) {
-        btnAbrirWhatsapp.classList.remove("d-none");
-      } else {
-        btnAbrirWhatsapp.classList.add("d-none");
-      }
-
-      const assuntoEmail = encodeURIComponent("🔒 Spoiler protegido");
-      const corpoEmail = encodeURIComponent(
-        `🔒 Spoiler protegido\n\n` +
-        `Livro: ${resposta.livro || livro}\n\n` +
-        `Mensagem criptografada:\n${mensagemCriptografada}\n\n` +
-        `Hash:\n${hash}\n\n` +
-        `Acesse o Modo Spoiler do Catálogo de Livros para revelar a mensagem usando este hash.`
+          selectDestinatario.appendChild(
+            option
+          );
+        }
       );
 
-      emailUrlAtual = emailDestinatario
-        ? `mailto:${emailDestinatario}?subject=${assuntoEmail}&body=${corpoEmail}`
-        : `mailto:?subject=${assuntoEmail}&body=${corpoEmail}`;
-
-      btnEnviarEmail.classList.remove("d-none");
-
-      carregarSpoilersRecebidos();
-
-      alert("✅ Spoiler criptografado com sucesso!");
-
     } catch (error) {
-      console.error("Erro ao criptografar spoiler:", error);
-      alert("Erro inesperado ao criptografar spoiler.");
+      console.error(
+        "Erro ao carregar usuários:",
+        error
+      );
     }
-  });
+  }
 
-  btnAbrirWhatsapp.addEventListener("click", () => {
-    if (!whatsappUrlAtual) {
-      alert("Link do WhatsApp não disponível.");
-      return;
-    }
+  formCriarSpoiler.addEventListener(
+    "submit",
+    async (e) => {
+      e.preventDefault();
 
-    window.open(whatsappUrlAtual, "_blank");
-  });
+      const livro =
+        selectLivro.value;
 
-  btnEnviarEmail.addEventListener("click", () => {
-    if (!emailUrlAtual) {
-      alert("Link de e-mail não disponível.");
-      return;
-    }
+      const mensagem =
+        document.getElementById(
+          "mensagemSpoiler"
+        ).value.trim();
 
-    window.location.href = emailUrlAtual;
-  });
+      const passo =
+        Number(
+          document.getElementById(
+            "passoSpoiler"
+          ).value
+        );
 
-  formRevelarSpoiler.addEventListener("submit", async (e) => {
-    e.preventDefault();
+      const destinatarioId =
+        selectDestinatario.value;
 
-    const mensagemCriptografada = document.getElementById("mensagemCriptografada").value.trim();
-    const hash = document.getElementById("hashSpoiler").value.trim();
+      try {
+        const res =
+          await fetch(
+            `${baseURL}/spoilers/criptografar`,
+            {
+              method:
+                "POST",
 
-    if (!mensagemCriptografada || !hash) {
-      alert("Preencha a mensagem criptografada e o hash.");
-      return;
-    }
+              headers: {
+                ...authHeaders,
+                "Content-Type":
+                  "application/json"
+              },
 
-    const dados = {
-      mensagemCriptografada,
-      hash
-    };
+              body:
+                JSON.stringify({
+                  livro,
+                  mensagem,
+                  passo,
+                  destinatarioId
+                })
+            }
+          );
 
-    try {
-      const res = await fetch(`${baseURL}/spoilers/revelar`, {
-        method: "POST",
-        headers: {
-          ...authHeaders,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dados)
-      });
+        const resposta =
+          await res.json();
 
-      const resposta = await res.json();
+        if (!res.ok) {
+          alert(
+            resposta.error ||
+            "Erro ao criptografar."
+          );
 
-      if (!res.ok) {
-        alert(resposta.message || resposta.erro || "Erro ao revelar spoiler.");
-        return;
+          return;
+        }
+
+        document.getElementById(
+          "resultadoLivro"
+        ).textContent =
+          livro;
+
+        document.getElementById(
+          "resultadoMensagem"
+        ).textContent =
+          resposta.mensagemCriptografada;
+
+        document.getElementById(
+          "resultadoHash"
+        ).textContent =
+          resposta.hash;
+
+        document.getElementById(
+          "resultadoCriptografia"
+        ).classList.remove(
+          "d-none"
+        );
+
+        opcoesEnvioSpoiler
+          .classList.remove(
+            "d-none"
+          );
+
+        whatsappUrlAtual =
+          resposta.whatsappUrl || "";
+
+        if (
+          whatsappUrlAtual
+        ) {
+          btnAbrirWhatsapp
+            .classList.remove(
+              "d-none"
+            );
+
+        } else {
+          btnAbrirWhatsapp
+            .classList.add(
+              "d-none"
+            );
+        }
+
+        carregarSpoilersRecebidos();
+
+        alert(
+          "✅ Spoiler criptografado com sucesso!"
+        );
+
+      } catch (error) {
+        console.error(
+          error
+        );
+
+        alert(
+          "Erro inesperado."
+        );
       }
-
-      document.getElementById("mensagemRevelada").textContent =
-        resposta.mensagemOriginal ||
-        resposta.mensagemRevelada ||
-        resposta.mensagem ||
-        "";
-
-      document.getElementById("resultadoRevelacao").classList.remove("d-none");
-
-      carregarSpoilersRecebidos();
-
-    } catch (error) {
-      console.error("Erro ao revelar spoiler:", error);
-      alert("Erro inesperado ao revelar spoiler.");
     }
-  });
+  );
+
+  btnAbrirWhatsapp
+    .addEventListener(
+      "click",
+      () => {
+        if (
+          !whatsappUrlAtual
+        ) {
+          return;
+        }
+
+        window.open(
+          whatsappUrlAtual,
+          "_blank"
+        );
+      }
+    );
+
+  formRevelarSpoiler
+    .addEventListener(
+      "submit",
+      async (e) => {
+        e.preventDefault();
+
+        const mensagemCriptografada =
+          document.getElementById(
+            "mensagemCriptografada"
+          ).value.trim();
+
+        const hash =
+          document.getElementById(
+            "hashSpoiler"
+          ).value.trim();
+
+        try {
+          const res =
+            await fetch(
+              `${baseURL}/spoilers/revelar`,
+              {
+                method:
+                  "POST",
+
+                headers: {
+                  ...authHeaders,
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    mensagemCriptografada,
+                    hash
+                  })
+              }
+            );
+
+          const resposta =
+            await res.json();
+
+          if (!res.ok) {
+            alert(
+              resposta.error
+            );
+
+            return;
+          }
+
+          document.getElementById(
+            "mensagemRevelada"
+          ).textContent =
+            resposta.mensagemOriginal;
+
+          document.getElementById(
+            "resultadoRevelacao"
+          ).classList.remove(
+            "d-none"
+          );
+
+          carregarSpoilersRecebidos();
+
+        } catch (error) {
+          console.error(
+            error
+          );
+        }
+      }
+    );
 
   async function carregarSpoilersRecebidos() {
     try {
-      tabelaSpoilersRecebidos.innerHTML = `
-        <tr>
-          <td colspan="4" class="text-center">Carregando spoilers recebidos...</td>
-        </tr>
-      `;
+      const res =
+        await fetch(
+          `${baseURL}/spoilers/recebidos`,
+          {
+            headers:
+              authHeaders
+          }
+        );
 
-      const res = await fetch(`${baseURL}/spoilers/recebidos`, {
-        headers: authHeaders
-      });
+      const spoilers =
+        await res.json();
 
-      const spoilers = await res.json();
-
-      if (!res.ok) {
-        tabelaSpoilersRecebidos.innerHTML = `
-          <tr>
-            <td colspan="4" class="text-center text-danger">Erro ao carregar spoilers recebidos.</td>
-          </tr>
-        `;
+      if (
+        !Array.isArray(
+          spoilers
+        )
+      ) {
         return;
       }
 
-      if (!Array.isArray(spoilers) || spoilers.length === 0) {
-        tabelaSpoilersRecebidos.innerHTML = `
-          <tr>
-            <td colspan="4" class="text-center">Nenhum spoiler recebido.</td>
-          </tr>
-        `;
-        return;
-      }
-
-      tabelaSpoilersRecebidos.innerHTML = spoilers.map(spoiler => {
-        const usado = spoiler.usado || spoiler.utilizado || false;
-
-        return `
-          <tr>
-            <td>${spoiler.livro || "-"}</td>
-            <td>${spoiler.mensagemCriptografada || spoiler.mensagem_criptografada || spoiler.mensagem || "-"}</td>
-            <td>${spoiler.hash || "-"}</td>
-            <td>
-              <span class="badge ${usado ? "badge-usado" : "badge-disponivel"}">
-                ${usado ? "Utilizado" : "Disponível"}
-              </span>
-            </td>
-          </tr>
-        `;
-      }).join("");
+      tabelaSpoilersRecebidos.innerHTML =
+        spoilers
+          .map(
+            (
+              spoiler
+            ) => `
+            <tr>
+              <td>${spoiler.livro}</td>
+              <td>${spoiler.mensagemCriptografada}</td>
+              <td>${spoiler.hash}</td>
+              <td>
+                <span class="badge ${spoiler.usado ? "badge-usado" : "badge-disponivel"}">
+                  ${spoiler.usado ? "Utilizado" : "Disponível"}
+                </span>
+              </td>
+            </tr>
+          `
+          )
+          .join("");
 
     } catch (error) {
-      console.error("Erro ao carregar spoilers recebidos:", error);
-      tabelaSpoilersRecebidos.innerHTML = `
-        <tr>
-          <td colspan="4" class="text-center text-danger">Erro inesperado ao carregar spoilers recebidos.</td>
-        </tr>
-      `;
+      console.error(
+        error
+      );
     }
   }
 
-  btnAtualizarRecebidos.addEventListener("click", carregarSpoilersRecebidos);
+  btnAtualizarRecebidos
+    .addEventListener(
+      "click",
+      carregarSpoilersRecebidos
+    );
 
   carregarLivros();
   carregarUsuarios();
