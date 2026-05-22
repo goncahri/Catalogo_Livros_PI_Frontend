@@ -1,4 +1,4 @@
-# 📚 Catálogo de Livros – Frontend (PI)
+# 📚 Catálogo de Livros – Frontend (PI).
 
 Interface web desenvolvida para o **Projeto Integrador (PI)** da FATEC, responsável pela interação do usuário com a API REST do projeto, permitindo autenticação, cadastro e gerenciamento de livros.
 
